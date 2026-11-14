@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mazzierialessandro99-wq.github.io/consumochiaro/sitemap.xml
