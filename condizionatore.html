@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quanto consuma un condizionatore – Calcolatore costo | ConsumoChiaro</title>
+<meta name="description" content="Calcola quanto costa tenere acceso il condizionatore: inserisci BTU, classe energetica e ore di utilizzo e scopri la spesa al mese e a stagione.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="logo" href="index.html">Consumo<span>Chiaro</span></a>
+  <nav>
+    <a href="elettrodomestici.html">Elettrodomestici</a>
+    <a href="condizionatore.html">Condizionatore</a>
+    <a href="auto-elettrica.html">Auto elettrica</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <h1>Quanto costa tenere acceso il condizionatore</h1>
+  <p class="lead">Stima la spesa del climatizzatore in raffrescamento (estate) o in riscaldamento con pompa di calore (inverno).</p>
+
+  <form id="f" class="card">
+    <div class="row">
+      <div>
+        <label for="btu">Potenza <span class="hint">(BTU/h)</span></label>
+        <select id="btu">
+          <option value="7000">7.000 BTU (~ 15-20 m²)</option>
+          <option value="9000" selected>9.000 BTU (~ 20-30 m²)</option>
+          <option value="12000">12.000 BTU (~ 30-40 m²)</option>
+          <option value="18000">18.000 BTU (~ 40-60 m²)</option>
+          <option value="24000">24.000 BTU (~ 60-80 m²)</option>
+        </select>
+      </div>
+      <div>
+        <label for="eff">Efficienza <span class="hint">(classe / tipo)</span></label>
+        <select id="eff">
+          <option value="6">Inverter recente, A++ / A+++</option>
+          <option value="4.5" selected>Inverter, A / A+</option>
+          <option value="3">Vecchio o non inverter</option>
+          <option value="2.2">Portatile</option>
+        </select>
+      </div>
+      <div>
+        <label for="load">Quanto lavora <span class="hint">(carico medio)</span></label>
+        <select id="load">
+          <option value="0.4">Poco (giornate miti)</option>
+          <option value="0.6" selected>Normale</option>
+          <option value="0.85">Molto (caldo/freddo intenso)</option>
+        </select>
+      </div>
+      <div>
+        <label for="h">Ore al giorno</label>
+        <input id="h" type="number" inputmode="decimal" min="0" max="24" step="any" value="6">
+      </div>
+      <div>
+        <label for="days">Giorni a stagione</label>
+        <input id="days" type="number" inputmode="decimal" min="0" step="1" value="90">
+      </div>
+      <div>
+        <label for="p">Prezzo energia <span class="hint">(€/kWh)</span></label>
+        <input id="p" type="number" inputmode="decimal" min="0" step="0.01" value="0.28">
+      </div>
+    </div>
+
+    <div class="results" aria-live="polite">
+      <div><small>All'ora</small><b id="r-hour">–</b></div>
+      <div><small>Al giorno</small><b id="r-day">–</b></div>
+      <div><small>Al mese</small><b id="r-month">–</b></div>
+      <div><small>A stagione</small><b id="r-season">–</b></div>
+    </div>
+    <p class="note">Stima basata su potenza frigorifera (BTU), efficienza media stagionale e carico medio di lavoro. I consumi reali dipendono da isolamento, temperatura impostata ed esposizione al sole. Il prezzo di 0,28 €/kWh è indicativo.</p>
+  </form>
+
+  <h2>Come si calcola il consumo del condizionatore</h2>
+  <p>I BTU indicano la potenza di raffreddamento, non il consumo. Per sapere quanta elettricità assorbe si converte in kW (1.000 BTU/h ≈ 0,293 kW) e si divide per l'efficienza (EER/SEER in estate, COP/SCOP in inverno). Un 9.000 BTU (2,6 kW di freddo) con efficienza 4,5 assorbe circa 0,6 kW quando lavora al massimo. Un inverter però lavora quasi sempre a potenza ridotta: per questo il calcolatore considera un carico medio.</p>
+
+  <h2>Consigli per spendere meno</h2>
+  <p>Imposta 26-27 °C d'estate (non oltre 7-8 gradi in meno rispetto all'esterno), usa la funzione deumidificazione nelle giornate umide, chiudi tapparelle e tende nelle ore di sole e pulisci i filtri ogni 2-3 settimane durante l'uso.</p>
+
+  <h2>Domande frequenti</h2>
+  <details><summary>Scaldare con il condizionatore conviene rispetto al gas?</summary>
+    <p>Spesso sì, con un climatizzatore inverter efficiente: produce 3-4 kWh di calore per ogni kWh elettrico consumato. La convenienza dipende dal prezzo di luce e gas e da quanto è freddo dove vivi.</p></details>
+  <details><summary>Conviene spegnerlo quando esco?</summary>
+    <p>Per assenze brevi (1-2 ore) con un inverter conviene alzare un po' la temperatura invece di spegnerlo. Per assenze lunghe conviene spegnerlo.</p></details>
+  <details><summary>Il portatile consuma di più?</summary>
+    <p>In genere sì: è meno efficiente di uno split fisso e, avendo il tubo di scarico nella stanza, disperde parte del lavoro fatto.</p></details>
+</main>
+
+<footer class="site"><div class="wrap">
+  © <span id="year"></span> ConsumoChiaro · I risultati sono stime indicative e non sostituiscono la lettura della bolletta.
+</div></footer>
+<script src="common.js"></script>
+<script>
+live('f', () => {
+  const kwCool = val('btu') / 1000 * 0.293;
+  const eff = val('eff') || 1;
+  const kwIn = kwCool / eff * val('load');
+  const p = val('p');
+  const h = Math.min(val('h'), 24);
+  const hourCost = kwIn * p;
+  put('r-hour', euro.format(hourCost));
+  put('r-day', euro.format(hourCost * h));
+  put('r-month', euro.format(hourCost * h * 30));
+  put('r-season', euro.format(hourCost * h * val('days')));
+});
+</script>
+</body>
+</html>

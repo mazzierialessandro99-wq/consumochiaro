@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Costo ricarica auto elettrica – Calcolatore e confronto benzina | ConsumoChiaro</title>
+<meta name="description" content="Calcola quanto costa ricaricare un'auto elettrica a casa o alle colonnine e confronta la spesa con un'auto a benzina o diesel.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="logo" href="index.html">Consumo<span>Chiaro</span></a>
+  <nav>
+    <a href="elettrodomestici.html">Elettrodomestici</a>
+    <a href="condizionatore.html">Condizionatore</a>
+    <a href="auto-elettrica.html">Auto elettrica</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <h1>Quanto costa ricaricare un'auto elettrica</h1>
+  <p class="lead">Calcola il costo di una ricarica completa e la spesa annua, poi confrontala con un'auto a benzina o diesel.</p>
+
+  <form id="f" class="card">
+    <div class="row">
+      <div>
+        <label for="bat">Batteria <span class="hint">(kWh)</span></label>
+        <input id="bat" type="number" inputmode="decimal" min="0" step="any" value="50">
+      </div>
+      <div>
+        <label for="cons">Consumo <span class="hint">(kWh/100 km)</span></label>
+        <input id="cons" type="number" inputmode="decimal" min="0" step="any" value="16">
+      </div>
+      <div>
+        <label for="km">Km all'anno</label>
+        <input id="km" type="number" inputmode="decimal" min="0" step="500" value="12000">
+      </div>
+      <div>
+        <label for="where">Dove ricarichi</label>
+        <select id="where">
+          <option value="0.28">A casa (0,28 €/kWh)</option>
+          <option value="0.55">Colonnina pubblica lenta (0,55 €/kWh)</option>
+          <option value="0.75">Colonnina rapida (0,75 €/kWh)</option>
+          <option value="custom">Prezzo personalizzato</option>
+        </select>
+      </div>
+      <div>
+        <label for="p">Prezzo ricarica <span class="hint">(€/kWh)</span></label>
+        <input id="p" type="number" inputmode="decimal" min="0" step="0.01" value="0.28">
+      </div>
+    </div>
+
+    <h2 style="margin-top:20px">Confronto con auto termica</h2>
+    <div class="row">
+      <div>
+        <label for="fuel">Consumo <span class="hint">(litri/100 km)</span></label>
+        <input id="fuel" type="number" inputmode="decimal" min="0" step="any" value="6">
+      </div>
+      <div>
+        <label for="fp">Prezzo carburante <span class="hint">(€/litro)</span></label>
+        <input id="fp" type="number" inputmode="decimal" min="0" step="0.01" value="1.80">
+      </div>
+    </div>
+
+    <div class="results" aria-live="polite">
+      <div><small>Ricarica 10→80%</small><b id="r-charge">–</b></div>
+      <div><small>Ogni 100 km</small><b id="r-100">–</b></div>
+      <div><small>Elettrica, all'anno</small><b id="r-ev">–</b></div>
+      <div><small>Termica, all'anno</small><b id="r-ice">–</b></div>
+      <div><small>Risparmio annuo</small><b id="r-save">–</b></div>
+    </div>
+    <p class="note">Il calcolo include circa il 10% di perdite durante la ricarica. Prezzi indicativi: inserisci quelli del tuo contratto o della tua colonnina per un risultato preciso. Il confronto riguarda solo energia e carburante, non manutenzione, bollo e assicurazione.</p>
+  </form>
+
+  <h2>Come si calcola il costo di ricarica</h2>
+  <p>Si moltiplicano i kWh caricati per il prezzo al kWh. Durante la ricarica una parte dell'energia va persa in calore (circa il 10% a casa), per questo il costo reale è leggermente più alto dei kWh che entrano nella batteria. Di solito si ricarica dal 10-20% all'80%, perché oltre la ricarica rallenta.</p>
+
+  <h2>Domande frequenti</h2>
+  <details><summary>Ricaricare a casa conviene sempre?</summary>
+    <p>Quasi sempre è l'opzione più economica, soprattutto con una tariffa a fasce ricaricando di notte o con un impianto fotovoltaico. Le colonnine rapide sono comode in viaggio ma costano molto di più.</p></details>
+  <details><summary>Posso ricaricare da una presa normale?</summary>
+    <p>Sì, ma lentamente (circa 2 kW): una batteria da 50 kWh richiede più di un giorno intero. Una wallbox da 3,7-7,4 kW accorcia molto i tempi; potrebbe servire aumentare la potenza del contatore.</p></details>
+  <details><summary>Quanto consuma un'auto elettrica?</summary>
+    <p>In media 14-20 kWh ogni 100 km: meno in città, di più in autostrada e d'inverno, quando il riscaldamento e il freddo riducono l'autonomia.</p></details>
+</main>
+
+<footer class="site"><div class="wrap">
+  © <span id="year"></span> ConsumoChiaro · I risultati sono stime indicative e non sostituiscono la lettura della bolletta.
+</div></footer>
+<script src="common.js"></script>
+<script>
+const where = document.getElementById('where');
+where.addEventListener('change', () => {
+  if (where.value !== 'custom') document.getElementById('p').value = where.value;
+});
+document.getElementById('p').addEventListener('input', () => { where.value = 'custom'; });
+live('f', () => {
+  const LOSS = 1.1;
+  const p = val('p');
+  const per100 = val('cons') * LOSS * p;
+  const evYear = per100 * val('km') / 100;
+  const iceYear = val('fuel') * val('fp') * val('km') / 100;
+  put('r-charge', euro.format(val('bat') * 0.7 * LOSS * p));
+  put('r-100', euro.format(per100));
+  put('r-ev', euro.format(evYear));
+  put('r-ice', euro.format(iceYear));
+  const save = iceYear - evYear;
+  put('r-save', (save < 0 ? '−' : '') + euro.format(Math.abs(save)));
+});
+</script>
+</body>
+</html>

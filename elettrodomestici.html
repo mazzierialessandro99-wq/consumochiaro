@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quanto consuma un elettrodomestico – Calcolatore costo | ConsumoChiaro</title>
+<meta name="description" content="Calcola quanto costa in bolletta lavatrice, forno, frigorifero, phon, stufetta elettrica e altri elettrodomestici: costo al giorno, al mese e all'anno.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="logo" href="index.html">Consumo<span>Chiaro</span></a>
+  <nav>
+    <a href="elettrodomestici.html">Elettrodomestici</a>
+    <a href="condizionatore.html">Condizionatore</a>
+    <a href="auto-elettrica.html">Auto elettrica</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <h1>Quanto costa un elettrodomestico in bolletta</h1>
+  <p class="lead">Scegli l'elettrodomestico o inserisci la potenza a mano: il costo si aggiorna subito.</p>
+
+  <form id="f" class="card">
+    <label for="preset">Elettrodomestico</label>
+    <select id="preset">
+      <option value="">— Scegli o inserisci a mano —</option>
+      <option value="2000|1|3">Lavatrice (lavaggio 40°)</option>
+      <option value="2500|1|3">Asciugatrice</option>
+      <option value="1300|1.5|4">Lavastoviglie</option>
+      <option value="2200|1|3">Forno elettrico</option>
+      <option value="1000|0.2|7">Forno a microonde</option>
+      <option value="40|24|7">Frigorifero (media reale)</option>
+      <option value="2000|2|7">Stufetta elettrica</option>
+      <option value="1800|0.2|7">Phon / asciugacapelli</option>
+      <option value="2000|0.1|7">Bollitore elettrico</option>
+      <option value="100|4|7">Televisore</option>
+      <option value="150|6|5">PC fisso</option>
+      <option value="50|6|5">Computer portatile</option>
+      <option value="1200|1|3">Ferro da stiro</option>
+    </select>
+
+    <div class="row">
+      <div>
+        <label for="w">Potenza <span class="hint">(watt)</span></label>
+        <input id="w" type="number" inputmode="decimal" min="0" step="any" value="2000">
+      </div>
+      <div>
+        <label for="h">Ore di utilizzo <span class="hint">(per volta / al giorno)</span></label>
+        <input id="h" type="number" inputmode="decimal" min="0" step="any" value="1">
+      </div>
+      <div>
+        <label for="d">Giorni a settimana</label>
+        <input id="d" type="number" inputmode="decimal" min="0" max="7" step="any" value="3">
+      </div>
+      <div>
+        <label for="p">Prezzo energia <span class="hint">(€/kWh)</span></label>
+        <input id="p" type="number" inputmode="decimal" min="0" step="0.01" value="0.28">
+      </div>
+    </div>
+
+    <div class="results" aria-live="polite">
+      <div><small>Per utilizzo</small><b id="r-use">–</b></div>
+      <div><small>Al mese</small><b id="r-month">–</b></div>
+      <div><small>All'anno</small><b id="r-year">–</b></div>
+      <div><small>Consumo annuo</small><b id="r-kwh">–</b></div>
+    </div>
+    <p class="note">Molti elettrodomestici non lavorano sempre alla potenza massima (ad esempio lavatrice e frigorifero scaldano o raffreddano solo per una parte del tempo): il risultato reale può essere più basso. Il prezzo di 0,28 €/kWh è indicativo: controlla la tua bolletta.</p>
+  </form>
+
+  <h2>Come si calcola il consumo di un elettrodomestico</h2>
+  <p>Si moltiplica la potenza in kilowatt (watt diviso 1000) per le ore di utilizzo: si ottengono i kWh consumati. Moltiplicando i kWh per il prezzo dell'energia si ottiene il costo. Esempio: un phon da 1800 W usato 10 minuti consuma 1,8 × 0,17 ≈ 0,3 kWh, cioè circa 8 centesimi a 0,28 €/kWh.</p>
+
+  <h2>Dove trovo la potenza?</h2>
+  <p>Sull'etichetta dati, di solito sul retro o sotto l'apparecchio, o nel libretto di istruzioni, indicata in W (watt). Per frigoriferi, lavatrici e lavastoviglie è più affidabile il consumo annuo in kWh riportato sull'etichetta energetica.</p>
+
+  <h2>Domande frequenti</h2>
+  <details><summary>Quale elettrodomestico consuma di più?</summary>
+    <p>Quelli che producono calore: stufette elettriche, asciugatrici, forni, scaldabagni elettrici e, d'inverno, i condizionatori in modalità riscaldamento. Lasciati accesi per molte ore pesano molto più di TV o computer.</p></details>
+  <details><summary>Lo standby consuma davvero?</summary>
+    <p>Sì, poco ma sempre: un dispositivo che consuma 2 W in standby tutto l'anno costa circa 5 € l'anno a 0,28 €/kWh. Con dieci dispositivi la cifra diventa significativa.</p></details>
+  <details><summary>Conviene usare gli elettrodomestici di sera?</summary>
+    <p>Solo se hai una tariffa a fasce orarie: in quel caso la fascia serale e il weekend costano di solito meno. Con una tariffa monoraria il prezzo è uguale a qualsiasi ora.</p></details>
+</main>
+
+<footer class="site"><div class="wrap">
+  © <span id="year"></span> ConsumoChiaro · I risultati sono stime indicative e non sostituiscono la lettura della bolletta.
+</div></footer>
+<script src="common.js"></script>
+<script>
+document.getElementById('preset').addEventListener('change', e => {
+  if (!e.target.value) return;
+  const [w, h, d] = e.target.value.split('|');
+  document.getElementById('w').value = w;
+  document.getElementById('h').value = h;
+  document.getElementById('d').value = d;
+});
+live('f', () => {
+  const kwhUse = val('w') / 1000 * val('h');
+  const days = Math.min(val('d'), 7);
+  const kwhYear = kwhUse * days * 52.14;
+  const p = val('p');
+  put('r-use', euro.format(kwhUse * p));
+  put('r-month', euro.format(kwhYear / 12 * p));
+  put('r-year', euro.format(kwhYear * p));
+  put('r-kwh', num(kwhYear, 0) + ' kWh');
+});
+</script>
+</body>
+</html>
